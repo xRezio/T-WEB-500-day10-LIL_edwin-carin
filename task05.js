@@ -1,45 +1,39 @@
-function displayValidationMessage(id, message, isError) {
-    const element = document.getElementById(id);
-    element.textContent = message;
-    element.style.color = isError ? 'red' : 'green';
-}
+document.getElementById('searchButton').addEventListener('click', function () {
+    const type = document.getElementById('typeInput').value.trim();
+    const brand = document.getElementById('brandInput').value.trim();
+    const price = document.getElementById('priceInput').value.trim();
+    const number = document.getElementById('numberInput').value.trim();
 
-function validateInput(event) {
-    const input = event.target;
-    const value = input.value.trim();
-    const name = input.name;
+    // Build the URL for the search based on the provided filters
+    let searchUrl = 'task05.php?search=true';
 
-    const typeRegex = /^[A-Za-z-]{3,10}$/;
-    const brandRegex = /^[A-Za-z0-9&-]{2,20}$/;
-    const priceRegex = /^[><]?[0-9]{2,5}$/;
-    const numberRegex = /^[1-9][0-9]*$/;
-
-    if (name === 'type') {
-        if (!typeRegex.test(value)) {
-            displayValidationMessage('typeValidation', 'Invalid type.', true);
-        } else {
-            displayValidationMessage('typeValidation', 'Type is valid.', false);
-        }
-    } else if (name === 'brand') {
-        if (!brandRegex.test(value)) {
-            displayValidationMessage('brandValidation', 'Invalid brand.', true);
-        } else {
-            displayValidationMessage('brandValidation', 'Brand is valid.', false);
-        }
-    } else if (name === 'price') {
-        if (!priceRegex.test(value)) {
-            displayValidationMessage('priceValidation', 'Invalid price.', true);
-        } else {
-            displayValidationMessage('priceValidation', 'Price is valid.', false);
-        }
-    } else if (name === 'number') {
-        if (!numberRegex.test(value)) {
-            displayValidationMessage('numberValidation', 'Invalid number.', true);
-        } else {
-            displayValidationMessage('numberValidation', 'Number is valid.', false);
-        }
+    if (type !== '') {
+        searchUrl += '&type=' + type;
     }
-}
+
+    if (brand !== '') {
+        searchUrl += '&brand=' + brand;
+    }
+
+    if (price !== '') {
+        searchUrl += '&price=' + price;
+    }
+
+    if (number !== '') {
+        searchUrl += '&number=' + number;
+    }
+
+    // Send the AJAX request for the search
+    fetch(searchUrl)
+        .then(response => response.json())
+        .then(data => {
+            // Update the table with the search results
+            updateProductTable(data.products);
+        })
+        .catch(error => {
+            console.error('An error occurred:', error);
+        });
+});
 
 function updateProductTable(products) {
     const table = document.getElementById('productTable');
@@ -55,39 +49,10 @@ function updateProductTable(products) {
         const brandCell = row.insertCell(1);
         const priceCell = row.insertCell(2);
         const numberCell = row.insertCell(3);
-        const stockCell = row.insertCell(4);
 
         typeCell.textContent = product.type;
         brandCell.textContent = product.brand;
         priceCell.textContent = product.price;
-        numberCell.textContent = product.number;
-        stockCell.textContent = product.stock;
+        numberCell.textContent = product.stock;
     });
 }
-
-document.getElementById('typeInput').addEventListener('input', validateInput);
-document.getElementById('brandInput').addEventListener('input', validateInput);
-document.getElementById('priceInput').addEventListener('input', validateInput);
-document.getElementById('numberInput').addEventListener('input', validateInput);
-
-document.getElementById('addProductForm').addEventListener('submit', function (event) {
-    event.preventDefault();
-
-    const formData = new FormData(this);
-
-    fetch('task05.php?type=' + formData.get('type') + '&brand=' + formData.get('brand') + '&price=' + formData.get('price') + '&number=' + formData.get('number'), {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.message ==='Product added successfully.'){
-            updateProductTable(data.products);
-        }
-        document.getElementById('resultMessage').textContent = data.message;
-    })
-    .catch(error => {
-        console.error('An error occurred:', error);
-    });
-});
-
