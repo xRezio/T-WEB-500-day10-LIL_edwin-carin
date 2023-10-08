@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Task03</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Task03</h1>
+        <button class="btn btn-primary" id="loadCountries">Charger les pays</button>
+        <table class="table mt-3">
+            <thead>
+                <tr>
+                    <th>Country Code</th>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody id="countryTableBody"></tbody>
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        document.getElementById("loadCountries").addEventListener("click", function() {
+            fetch("day10/countries.json")
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById("countryTableBody");
+                    tableBody.innerHTML = ""; 
+                    for (const countryCode in data) {
+                        const countryName = data[countryCode];
+                        const row = tableBody.insertRow();
+                        const cell1 = row.insertCell(0);
+                        const cell2 = row.insertCell(1);
+                        cell1.innerHTML = countryCode;
+                        cell2.innerHTML = countryName;
+                    }
+                })
+                .catch(error => {
+                    console.error("Erreur lors de la récup des données:", error);
+                });
+        });
+    </script>
+</body>
+</html>
